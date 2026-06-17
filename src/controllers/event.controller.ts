@@ -52,3 +52,20 @@ export async function getEventSummary(req: Request, res: Response, next: NextFun
     next(error);
   }
 }
+
+/**
+ * DELETE /events/:id
+ * Soft deletes an event.
+ */
+export async function deleteEvent(req: Request, res: Response, next: NextFunction) {
+  try {
+    const eventId = parseInt(req.params.id, 10);
+    await eventService.deleteEvent(eventId);
+    return res.status(200).json({
+      success: true,
+      message: 'Event deleted successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+}

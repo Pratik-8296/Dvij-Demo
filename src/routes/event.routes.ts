@@ -22,4 +22,9 @@ router.get(
   eventController.getEventSummary
 );
 
+router.delete(
+  '/:id',
+  eventController.deleteEvent
+);
+
 export default router;

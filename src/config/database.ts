@@ -10,30 +10,21 @@ const dbUser = process.env.DB_USER || 'root';
 const dbPassword = process.env.DB_PASSWORD || '';
 const dbName = process.env.DB_NAME || 'event_management';
 
-const sequelize = dbDialect === 'sqlite'
-  ? new Sequelize({
-      dialect: 'sqlite',
-      storage: './database.sqlite',
-      logging: process.env.NODE_ENV === 'development' ? console.log : false,
-      define: {
-        timestamps: true,
-      },
-    })
-  : new Sequelize(dbName, dbUser, dbPassword, {
-      host: dbHost,
-      port: dbPort,
-      dialect: 'mysql',
-      logging: process.env.NODE_ENV === 'development' ? console.log : false,
-      define: {
-        timestamps: true,
-      },
-      pool: {
-        max: 5,
-        min: 0,
-        acquire: 30000,
-        idle: 10000,
-      },
-    });
+const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
+  host: dbHost,
+  port: dbPort,
+  dialect: 'mysql',
+  logging: process.env.NODE_ENV === 'development' ? console.log : false,
+  define: {
+    timestamps: true,
+  },
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000,
+  },
+});
 
 export default sequelize;
 export { sequelize };

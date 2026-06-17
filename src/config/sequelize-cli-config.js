@@ -3,7 +3,6 @@ require('dotenv').config();
 module.exports = {
   development: {
     dialect: process.env.DB_DIALECT || 'mysql',
-    storage: './database.sqlite',
     username: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || null,
     database: process.env.DB_NAME || 'event_management',
@@ -12,7 +11,6 @@ module.exports = {
   },
   test: {
     dialect: process.env.DB_DIALECT || 'mysql',
-    storage: './database_test.sqlite',
     username: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || null,
     database: process.env.DB_NAME || 'event_management_test',
@@ -22,7 +20,6 @@ module.exports = {
   },
   production: {
     dialect: process.env.DB_DIALECT || 'mysql',
-    storage: './database_prod.sqlite',
     username: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,

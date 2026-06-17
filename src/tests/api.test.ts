@@ -207,4 +207,58 @@ describe('API Integration Tests', () => {
       expect(response.body.message).toBe('Registration not found');
     });
   });
+
+  describe('DELETE /events/:id (Event Soft Deletion)', () => {
+    it('should successfully soft delete an event if it has no active registrations', async () => {
+      const mockEvent = {
+        id: 1,
+        eventName: 'Test Event',
+        destroy: jest.fn().mockResolvedValue(true),
+      };
+
+      (Event.findByPk as jest.Mock).mockResolvedValue(mockEvent);
+      (Registration.findOne as jest.Mock).mockResolvedValue(null);
+
+      const response = await request(app)
+        .delete('/events/1')
+        .send();
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.message).toBe('Event deleted successfully');
+      expect(mockEvent.destroy).toHaveBeenCalled();
+    });
+
+    it('should return 404 if the event to delete is not found', async () => {
+      (Event.findByPk as jest.Mock).mockResolvedValue(null);
+
+      const response = await request(app)
+        .delete('/events/999')
+        .send();
+
+      expect(response.status).toBe(404);
+      expect(response.body.success).toBe(false);
+      expect(response.body.message).toBe('Event not found');
+    });
+
+    it('should return 400 if the event has active registrations', async () => {
+      const mockEvent = {
+        id: 2,
+        eventName: 'Active Event',
+        destroy: jest.fn(),
+      };
+
+      (Event.findByPk as jest.Mock).mockResolvedValue(mockEvent);
+      (Registration.findOne as jest.Mock).mockResolvedValue({ id: 10, status: 'REGISTERED' });
+
+      const response = await request(app)
+        .delete('/events/2')
+        .send();
+
+      expect(response.status).toBe(400);
+      expect(response.body.success).toBe(false);
+      expect(response.body.message).toBe('Cannot delete an event that has active or waitlisted registrations');
+      expect(mockEvent.destroy).not.toHaveBeenCalled();
+    });
+  });
 });

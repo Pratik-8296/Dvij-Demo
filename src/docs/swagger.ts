@@ -83,6 +83,52 @@ const swaggerDocument: any = {
         },
       },
     },
+    '/events/{id}': {
+      delete: {
+        tags: ['Events'],
+        summary: 'Delete an event (Soft Delete)',
+        description: 'Performs a soft delete on an event. The event will not be permanently deleted, but will be marked as deleted (using deletedAt). Prevented if active or waitlisted registrations exist.',
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'integer' }, description: 'Event ID' },
+        ],
+        responses: {
+          200: {
+            description: 'Event deleted successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', example: true },
+                    message: { type: 'string', example: 'Event deleted successfully' },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: 'Validation failed or active registrations exist',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ErrorResponse',
+                },
+              },
+            },
+          },
+          404: {
+            description: 'Event not found',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ErrorResponse',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     '/events/{id}/summary': {
       get: {
         tags: ['Events'],

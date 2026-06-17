@@ -1,6 +1,5 @@
 import { Op, fn, col } from 'sequelize';
-import { Event } from '../models/Event';
-import { Registration } from '../models/Registration';
+import { Event, Registration } from '../models';
 import { AppError } from '../middlewares/error.middleware';
 import { getPagination, getPagingData, getSorting } from '../utils/query.utils';
 
@@ -152,4 +151,32 @@ export async function getEventSummary(eventId: number) {
     availableSeats,
     totalRevenue,
   };
+}
+
+/**
+ * Soft delete an event by ID.
+ * Prevents deletion if the event has active (REGISTERED) or WAITLIST registrations.
+ */
+export async function deleteEvent(eventId: number): Promise<void> {
+  const event = await Event.findByPk(eventId);
+  if (!event) {
+    throw new AppError('Event not found', 404);
+  }
+
+  // Check for active or waitlisted registrations
+  const activeRegistrations = await Registration.findOne({
+    where: {
+      eventId,
+      status: {
+        [Op.in]: ['REGISTERED', 'WAITLIST'],
+      },
+    },
+  });
+
+  if (activeRegistrations) {
+    throw new AppError('Cannot delete an event that has active or waitlisted registrations', 400);
+  }
+
+  // Perform soft delete
+  await event.destroy();
 }
